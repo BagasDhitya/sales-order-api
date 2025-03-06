@@ -1,19 +1,19 @@
-import express, { Request, Response } from 'express';
-import dotenv from 'dotenv'
+import express from "express";
+import { AppDataSource } from "./data-source";
+import salesRoutes from "./routers/sales.route";
+import purchaseRoutes from "./routers/purchase.route";
+import dotenv from "dotenv";
 
-dotenv.config()
+dotenv.config();
+
 const app = express();
-const PORT = process.env.DEV_PORT
-
-// Middleware
 app.use(express.json());
 
-// Routes
-app.get('/', (req: Request, res: Response) => {
-    res.send('Hello World!');
-});
+app.use("/sales", salesRoutes);
+app.use("/purchases", purchaseRoutes);
 
-// Start the server
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+AppDataSource.initialize()
+    .then(() => {
+        app.listen(3000, () => console.log("Server running on port 3000"));
+    })
+    .catch((err) => console.error("Database connection error:", err));
