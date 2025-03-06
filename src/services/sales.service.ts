@@ -3,7 +3,7 @@ import { Sales } from "../entities/Sales";
 
 const salesRepository = AppDataSource.getRepository(Sales);
 
-function createSale(saleData: Partial<Sales>) {
+function createSale(saleData: Partial<Sales>, price: any, quantity: any) {
     const sale = salesRepository.create(saleData);
     return salesRepository.save(sale);
 }
