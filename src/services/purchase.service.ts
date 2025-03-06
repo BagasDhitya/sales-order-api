@@ -1,26 +1,32 @@
 import { AppDataSource } from "../data-source";
-import { Purchase } from "../entities/Purchase";
+import { Purchases } from "../entities/Purchases";
+import { Repository } from "typeorm";
 
-const purchaseRepository = AppDataSource.getRepository(Purchase);
+export class PurchaseService {
+    private purchaseRepository: Repository<Purchases>;
 
-function createPurchase(supplierName: string, totalAmount: number, status: string) {
-    const purchase = new Purchase();
-    purchase.supplierName = supplierName;
-    purchase.totalAmount = totalAmount;
-    purchase.status = status;
-    return purchaseRepository.save(purchase);
+    constructor() {
+        this.purchaseRepository = AppDataSource.getRepository(Purchases);
+    }
+
+    async createPurchase(purchaseData: Partial<Purchases>): Promise<Purchases> {
+        const purchase = this.purchaseRepository.create(purchaseData);
+        return await this.purchaseRepository.save(purchase);
+    }
+
+    async getAllPurchases(): Promise<Purchases[]> {
+        return await this.purchaseRepository.find();
+    }
+
+    async getPurchaseById(id: number): Promise<Purchases | null> {
+        return await this.purchaseRepository.findOneBy({ id });
+    }
+
+    async updatePurchase(id: number, purchaseData: Partial<Purchases>): Promise<void> {
+        await this.purchaseRepository.update(id, purchaseData);
+    }
+
+    async deletePurchase(id: number): Promise<void> {
+        await this.purchaseRepository.delete(id);
+    }
 }
-
-function getPurchases() {
-    return purchaseRepository.find();
-}
-
-function getPurchaseById(id: number) {
-    return purchaseRepository.findOneBy({ id });
-}
-
-function deletePurchase(id: number) {
-    return purchaseRepository.delete(id);
-}
-
-export { createPurchase, getPurchases, getPurchaseById, deletePurchase };

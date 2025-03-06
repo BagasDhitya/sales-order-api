@@ -1,34 +1,79 @@
 import { Request, Response } from "express";
-import { createSale, getAllSales, getSaleById, deleteSale } from "../services/sales.service";
+import { SalesService } from "../services/sales.service";
 
-function createSaleHandler(req: Request, res: Response) {
-    const { productName, price, quantity } = req.body;
-    createSale(productName, price, quantity)
-        .then((sale) => res.status(201).json(sale))
-        .catch((err) => res.status(500).json({ message: err.message }));
+export class SalesController {
+    private salesService: SalesService;
+
+    constructor() {
+        this.salesService = new SalesService();
+    }
+
+    async createSale(req: Request, res: Response): Promise<Response> {
+        try {
+            const sale = await this.salesService.createSale(req.body);
+            return res.status(201).json(sale);
+        } catch (error) {
+            console.error("Error creating sale:", error);
+            return res.status(400).json({ message: "Bad Request: Failed to create sale", error });
+        }
+    }
+
+    async getAllSales(req: Request, res: Response): Promise<Response> {
+        try {
+            const sales = await this.salesService.getAllSales();
+            return res.status(200).json(sales);
+        } catch (error) {
+            console.error("Error fetching sales:", error);
+            return res.status(500).json({ message: "Internal Server Error: Failed to fetch sales", error });
+        }
+    }
+
+    async getSaleById(req: Request, res: Response): Promise<Response> {
+        try {
+            const id = Number(req.params.id);
+            if (isNaN(id)) {
+                return res.status(400).json({ message: "Bad Request: Invalid sale ID" });
+            }
+
+            const sale = await this.salesService.getSaleById(id);
+            if (!sale) {
+                return res.status(404).json({ message: "Not Found: Sale not found" });
+            }
+
+            return res.status(200).json(sale);
+        } catch (error) {
+            console.error("Error fetching sale by ID:", error);
+            return res.status(500).json({ message: "Internal Server Error: Failed to fetch sale", error });
+        }
+    }
+
+    async updateSale(req: Request, res: Response): Promise<Response> {
+        try {
+            const id = Number(req.params.id);
+            if (isNaN(id)) {
+                return res.status(400).json({ message: "Bad Request: Invalid sale ID" });
+            }
+
+            await this.salesService.updateSale(id, req.body);
+            return res.status(200).json({ message: "Sale updated successfully" });
+        } catch (error) {
+            console.error("Error updating sale:", error);
+            return res.status(400).json({ message: "Bad Request: Failed to update sale", error });
+        }
+    }
+
+    async deleteSale(req: Request, res: Response): Promise<Response> {
+        try {
+            const id = Number(req.params.id);
+            if (isNaN(id)) {
+                return res.status(400).json({ message: "Bad Request: Invalid sale ID" });
+            }
+
+            await this.salesService.deleteSale(id);
+            return res.status(200).json({ message: "Sale deleted successfully" });
+        } catch (error) {
+            console.error("Error deleting sale:", error);
+            return res.status(500).json({ message: "Internal Server Error: Failed to delete sale", error });
+        }
+    }
 }
-
-function getSalesHandler(req: Request, res: Response) {
-    getAllSales()
-        .then((sales) => res.status(200).json(sales))
-        .catch((err) => res.status(500).json({ message: err.message }));
-}
-
-function getSaleByIdHandler(req: Request, res: Response) {
-    const id = Number(req.params.id);
-    getSaleById(id)
-        .then((sale) => {
-            if (!sale) return res.status(404).json({ message: "Sale not found" });
-            res.status(200).json(sale);
-        })
-        .catch((err) => res.status(500).json({ message: err.message }));
-}
-
-function deleteSaleHandler(req: Request, res: Response) {
-    const id = Number(req.params.id);
-    deleteSale(id)
-        .then(() => res.status(200).json({ message: "Sale deleted successfully" }))
-        .catch((err) => res.status(500).json({ message: err.message }));
-}
-
-export { createSaleHandler, getSalesHandler, getSaleByIdHandler, deleteSaleHandler };

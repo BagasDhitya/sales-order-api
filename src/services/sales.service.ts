@@ -1,27 +1,33 @@
 import { AppDataSource } from "../data-source";
 import { Sales } from "../entities/Sales";
+import { Repository } from "typeorm";
 
-const salesRepository = AppDataSource.getRepository(Sales);
+export class SalesService {
+    private salesRepository: Repository<Sales>;
 
-function createSale(saleData: Partial<Sales>, price: any, quantity: any) {
-    const sale = salesRepository.create(saleData);
-    return salesRepository.save(sale);
+    constructor() {
+        this.salesRepository = AppDataSource.getRepository(Sales);
+    }
+
+    async createSale(saleData: Partial<Sales>): Promise<Sales> {
+        console.log('salesss ', saleData);
+        const sale = this.salesRepository.create(saleData);
+        return await this.salesRepository.save(sale);
+    }
+
+    async getAllSales(): Promise<Sales[]> {
+        return await this.salesRepository.find();
+    }
+
+    async getSaleById(id: number): Promise<Sales | null> {
+        return await this.salesRepository.findOneBy({ id });
+    }
+
+    async updateSale(id: number, saleData: Partial<Sales>): Promise<void> {
+        await this.salesRepository.update(id, saleData);
+    }
+
+    async deleteSale(id: number): Promise<void> {
+        await this.salesRepository.delete(id);
+    }
 }
-
-function getAllSales() {
-    return salesRepository.find();
-}
-
-function getSaleById(id: number) {
-    return salesRepository.findOneBy({ id });
-}
-
-function updateSale(id: number, saleData: Partial<Sales>) {
-    return salesRepository.update(id, saleData);
-}
-
-function deleteSale(id: number) {
-    return salesRepository.delete(id);
-}
-
-export { createSale, getAllSales, getSaleById, updateSale, deleteSale };

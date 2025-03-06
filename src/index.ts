@@ -1,19 +1,47 @@
-import express from "express";
-import { AppDataSource } from "./data-source";
-import salesRoutes from "./routers/sales.route";
-import purchaseRoutes from "./routers/purchase.route";
+import express, { Application } from "express";
 import dotenv from "dotenv";
+import { AppDataSource } from "./data-source";
+import { SalesRoutes } from "./routers/sales.route";
+import { PurchaseRoutes } from "./routers/purchase.route";
 
 dotenv.config();
 
-const app = express();
-app.use(express.json());
+class App {
+    private app: Application;
+    private port: number;
 
-app.use("/sales", salesRoutes);
-app.use("/purchases", purchaseRoutes);
+    constructor() {
+        this.app = express();
+        this.port = Number(process.env.PORT) || 3000;
+        this.initializeMiddleware();
+        this.initializeRoutes();
+        this.initializeDatabase();
+    }
 
-AppDataSource.initialize()
-    .then(() => {
-        app.listen(3000, () => console.log("Server running on port 3000"));
-    })
-    .catch((err) => console.error("Database connection error:", err));
+    private initializeMiddleware(): void {
+        this.app.use(express.json());
+    }
+
+    private initializeRoutes(): void {
+        this.app.use("/api/sales", new SalesRoutes().router);
+        this.app.use("/api/purchases", new PurchaseRoutes().router);
+    }
+
+    private async initializeDatabase(): Promise<void> {
+        try {
+            await AppDataSource.initialize();
+            console.log("Database connected successfully");
+        } catch (error) {
+            console.error("Database connection error:", error);
+        }
+    }
+
+    public listen(): void {
+        this.app.listen(this.port, () => {
+            console.log(`Server running on port ${this.port}`);
+        });
+    }
+}
+
+const app = new App()
+app.listen()
