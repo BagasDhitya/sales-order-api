@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import { AppDataSource } from "./data-source";
 import { SalesRoutes } from "./routers/sales.route";
 import { PurchaseRoutes } from "./routers/purchase.route";
+import { ProfitRoutes } from "./routers/profit.route";
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ class App {
     private initializeRoutes(): void {
         this.app.use("/api/sales", new SalesRoutes().router);
         this.app.use("/api/purchases", new PurchaseRoutes().router);
+        this.app.use("/api/profit", new ProfitRoutes().router);
     }
 
     private async initializeDatabase(): Promise<void> {
