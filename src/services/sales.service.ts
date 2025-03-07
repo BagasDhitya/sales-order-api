@@ -1,4 +1,4 @@
-import { AppDataSource } from "../data-source";
+import AppDataSource from "../config/data.source";
 import { Sales } from "../entities/Sales";
 import { Repository } from "typeorm";
 

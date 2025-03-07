@@ -4,7 +4,8 @@
   "main": "src/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node-dev src/index.ts"
+    "dev": "ts-node-dev src/index.ts",
+    "migrate:dev": "npx typeorm migration:run -d ./src/config/data.source.ts"
   },
   "keywords": [],
   "author": "",

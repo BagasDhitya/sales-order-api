@@ -1,6 +1,6 @@
 import express, { Application } from "express";
 import dotenv from "dotenv";
-import { AppDataSource } from "./data-source";
+import AppDataSource from "./config/data.source";
 import { SalesRoutes } from "./routers/sales.route";
 import { PurchaseRoutes } from "./routers/purchase.route";
 import { ProfitRoutes } from "./routers/profit.route";

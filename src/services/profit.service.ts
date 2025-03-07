@@ -1,4 +1,4 @@
-import { AppDataSource } from "../../src/data-source";
+import AppDataSource from "../config/data.source";
 import { Sales } from "../entities/Sales";
 import { Purchases } from "../entities/Purchases";
 
